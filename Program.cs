@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace PullRequetStat
 {
@@ -6,7 +7,9 @@ namespace PullRequetStat
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            PullRequestClient client = new PullRequestClient();
+
+            IEnumerable<Pullrequest> prs = client.GetPullRequests(SearchCriterias.Completed);
         }
     }
 }
