@@ -11,12 +11,15 @@ class PullRequestClient
     protected virtual IEnumerable<Pullrequest> DeserializeJson(string json)
     {
         JObject jobject = JObject.Parse(json);
-        foreach (var item in jobject["value"])
+        foreach (JToken token in jobject["value"])
         {
-
+            yield return new Pullrequest 
+            { 
+                ClosedDate = token["closedDate"].Value<DateTime>(),
+                CreationDate = token["creationDate"].Value<DateTime>()
+            };
         }
 
-        return null;
         //return JsonConvert.DeserializeObject<IEnumerable<Pullrequest>>(json);
     }
 
@@ -35,7 +38,7 @@ class PullRequestClient
 class Pullrequest
 {
     public DateTime CreationDate { get; set; }
-    public DateTime CloseDate { get; set; }
+    public DateTime ClosedDate { get; set; }
 }
 
 class SearchCriterias
