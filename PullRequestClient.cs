@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -29,7 +30,9 @@ class PullRequestClient
         {
             client.Headers.Add(HttpRequestHeader.Authorization, "Basic OmZsNnhxcGJ6ZWx3amdndGdzZnVhbXh1aWhjaWRrd25uam5sc3JyeXJkMnI3N2ZoZXIzNWE=");
             string url = string.Format(GetPullRequestUrlPattern, searchCriteria);
-            return DeserializeJson(client.DownloadString(url));
+            string json = client.DownloadString(url);
+            File.WriteAllText("toto.json", client.DownloadString(url));
+            return DeserializeJson(json);
         }
     }
 
@@ -38,7 +41,10 @@ class PullRequestClient
 class Pullrequest
 {
     public DateTime CreationDate { get; set; }
+    
     public DateTime ClosedDate { get; set; }
+
+    public TimeSpan Duration { get => ClosedDate - CreationDate; }
 }
 
 class SearchCriterias

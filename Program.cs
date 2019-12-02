@@ -12,22 +12,18 @@ namespace PullRequetStat
 
             IEnumerable<Pullrequest> prs = client.GetPullRequests(SearchCriterias.Completed);
 
-            IEnumerable<double> filtered = prs
-                .Where(item => item.CreationDate >= new DateTime(2019, 11, 27))
-                .Select(item => item.ClosedDate.Subtract(item.CreationDate).TotalMilliseconds);
+            IEnumerable<TimeSpan> filtered = prs
+                .Where(item => item.CreationDate >= new DateTime(2019, 12, 02))
+                .Select(item => item.Duration);
 
+            double average = filtered.Average(item => item.TotalMilliseconds);
+            Console.WriteLine($"Average: {TimeSpan.FromMilliseconds(average)}");
             
-            double average = filtered.Average(item => item);
-            TimeSpan averageTimeSpan = TimeSpan.FromMilliseconds(average);
-            Console.WriteLine($"Average: {averageTimeSpan}");
+            double min = filtered.Min(item => item.TotalMilliseconds);
+            Console.WriteLine($"Min: {TimeSpan.FromMilliseconds(min)}");
             
-            double min = filtered.Min(item => item);
-            TimeSpan minTimeSpan = TimeSpan.FromMilliseconds(min);
-            Console.WriteLine($"Min: {minTimeSpan}");
-            
-            double max = filtered.Max(item => item);
-            TimeSpan maxTimeSpan = TimeSpan.FromMilliseconds(max);
-            Console.WriteLine($"Max: {maxTimeSpan}");
+            double max = filtered.Max(item => item.TotalMilliseconds);
+            Console.WriteLine($"Max: {TimeSpan.FromMilliseconds(max)}");
         }
     }
 }
