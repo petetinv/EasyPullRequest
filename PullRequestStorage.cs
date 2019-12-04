@@ -48,6 +48,9 @@ class PullRequestStorage
             AddValues(ws.Row(1), header);
             AddModel(ws.Row(2));
 
+            ws.Columns().AdjustToContents();
+            ws.RangeUsed().CreateTable();
+            
             workbook.SaveAs(path);
         }
     }
