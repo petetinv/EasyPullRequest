@@ -10,10 +10,10 @@ namespace PullRequetStat
         {
             PullRequestClient client = new PullRequestClient();
 
-            IEnumerable<Pullrequest> prs = client.GetPullRequests(SearchCriterias.Completed);
+            IEnumerable<PullRequestModel> prs = client.GetPullRequests(SearchCriterias.Completed);
 
             IEnumerable<TimeSpan> filtered = prs
-                .Where(item => item.CreationDate >= new DateTime(2019, 12, 02))
+                .Where(item => item.CreationDate >= new DateTime(2019, 11, 27))
                 .Select(item => item.Duration);
 
             double average = filtered.Average(item => item.TotalMilliseconds);
@@ -24,6 +24,8 @@ namespace PullRequetStat
             
             double max = filtered.Max(item => item.TotalMilliseconds);
             Console.WriteLine($"Max: {TimeSpan.FromMilliseconds(max)}");
+
+            
         }
     }
 }

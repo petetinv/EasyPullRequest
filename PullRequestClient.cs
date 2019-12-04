@@ -2,29 +2,28 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 class PullRequestClient
 {
     const string GetPullRequestUrlPattern = "https://airbus-caddmu.visualstudio.com/eBAM/_apis/git/pullrequests?&$skip=0&searchCriteria.status={0}&api-version=5.0";
 
-    protected virtual IEnumerable<Pullrequest> DeserializeJson(string json)
+    protected virtual IEnumerable<PullRequestModel> DeserializeJson(string json)
     {
         JObject jobject = JObject.Parse(json);
         foreach (JToken token in jobject["value"])
         {
-            yield return new Pullrequest 
+            yield return new PullRequestModel 
             { 
                 ClosedDate = token["closedDate"].Value<DateTime>(),
                 CreationDate = token["creationDate"].Value<DateTime>()
             };
         }
 
-        //return JsonConvert.DeserializeObject<IEnumerable<Pullrequest>>(json);
+        //return JsonConvert.DeserializeObject<IEnumerable<PullRequestModel>>(json);
     }
 
-    public IEnumerable<Pullrequest> GetPullRequests(string searchCriteria)
+    public IEnumerable<PullRequestModel> GetPullRequests(string searchCriteria)
     {
         using (WebClient client = new WebClient())
         {
@@ -36,18 +35,4 @@ class PullRequestClient
         }
     }
 
-}
-
-class Pullrequest
-{
-    public DateTime CreationDate { get; set; }
-    
-    public DateTime ClosedDate { get; set; }
-
-    public TimeSpan Duration { get => ClosedDate - CreationDate; }
-}
-
-class SearchCriterias
-{
-    static public string Completed = "completed";
 }
