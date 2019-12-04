@@ -10,12 +10,10 @@ namespace PullRequetStat
         {
             PullRequestClient client = new PullRequestClient();
 
-            IEnumerable<PullRequestModel> prs = client.GetPullRequests(SearchCriterias.Completed);
-
-            IEnumerable<PullRequestModel> filtered = prs
+            IEnumerable<PullRequestModel> prs = client.GetPullRequests(SearchCriterias.Completed)
                 .Where(item => item.CreationDate >= new DateTime(2019, 11, 27));
 
-            var storage = new PullRequestStorage(filtered);
+            var storage = new PullRequestStorage(prs);
             storage.Save("pr.xlsx");
         }
     }

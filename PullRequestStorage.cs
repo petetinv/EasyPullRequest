@@ -33,6 +33,7 @@ class PullRequestStorage
         {
             var values = ExtractValues(item);
             AddValues(row, values);
+            row = row.RowBelow();
         }
     }
 
