@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using ClosedXML.Excel;
 
@@ -49,7 +50,8 @@ class PullRequestStorage
             AddModel(ws.Row(2));
 
             ws.Columns().AdjustToContents();
-            ws.RangeUsed().CreateTable();
+            IXLTable table = ws.RangeUsed().CreateTable();
+            table.Sort("CreationDate", XLSortOrder.Descending);
             
             workbook.SaveAs(path);
         }

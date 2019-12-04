@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Diagnostics;
 
 namespace PullRequetStat
 {
@@ -13,8 +14,10 @@ namespace PullRequetStat
             IEnumerable<PullRequestModel> prs = client.GetPullRequests(SearchCriterias.Completed)
                 .Where(item => item.CreationDate >= new DateTime(2019, 11, 27));
 
+            var path = "pr.xlsx";
             var storage = new PullRequestStorage(prs);
-            storage.Save("pr.xlsx");
+            storage.Save(path);
+            Process.Start(@"C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE", path);
         }
     }
 }
