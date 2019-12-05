@@ -19,8 +19,6 @@ class PullRequestClient
                 CreationDate = token["creationDate"].Value<DateTime>()
             };
         }
-
-        //return JsonConvert.DeserializeObject<IEnumerable<PullRequestModel>>(json);
     }
 
     public IEnumerable<PullRequestModel> GetPullRequests(string searchCriteria)
@@ -30,7 +28,7 @@ class PullRequestClient
             client.Headers.Add(HttpRequestHeader.Authorization, "Basic OmZsNnhxcGJ6ZWx3amdndGdzZnVhbXh1aWhjaWRrd25uam5sc3JyeXJkMnI3N2ZoZXIzNWE=");
             string url = string.Format(GetPullRequestUrlPattern, searchCriteria);
             string json = client.DownloadString(url);
-            File.WriteAllText("toto.json", client.DownloadString(url));
+            //File.WriteAllText("toto.json", client.DownloadString(url));
             return DeserializeJson(json);
         }
     }
