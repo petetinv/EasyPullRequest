@@ -1,5 +1,5 @@
 # EasyPullRequest
-Retrieves somes informations about the pull request, such as its duration.
+Retrieves somes informations about the (AzureDevOps) pull request, such as its duration.
 
 **To set secret settings use the following commands**:
 * dotnet user-secrets set "AzureDevOpsSettings:OrganizationName": "YourDevOpsAzureOrganization"
