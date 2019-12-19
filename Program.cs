@@ -40,7 +40,7 @@ namespace PullRequetStat
             IEnumerable<PullRequestModel> prs = client.GetPullRequests(SearchCriterias.Completed)
                 .Where(item => item.CreationDate >= new DateTime(2019, 11, 27));
 
-            var path = "pr.xlsx";
+            var path = Path.ChangeExtension(Path.GetTempFileName(), ".xlsx");
             var storage = new PullRequestStorage(prs);
             storage.Save(path);
             Process.Start("explorer", path);
