@@ -14,7 +14,7 @@ namespace PullRequetStat
         public static IServiceProvider ServiceProvider { get; private set; }
         public static IConfiguration Configuration { get; set; }
 
-        static void Main(string[] args)
+        static void Initialize()
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -28,12 +28,14 @@ namespace PullRequetStat
             var services = new ServiceCollection();
             ConfigureServices(services);
             ServiceProvider = services.BuildServiceProvider();
+        }
+
+        static void Main(string[] args)
+        {
+            Initialize();
 
             PullRequestClientFactory factory = ServiceProvider.GetService<PullRequestClientFactory>();
             PullRequestClient client = factory.GetInstance();
-
-            //NOTE: add PAT with this command: dotnet user-secrets set pat "xxx"      
-            //PullRequestClient client = new PullRequestClient("airbus-caddmu", "EBAM", "ooxjgbvck3zs5e646k3gmmoqznsruscndfxgzdksp7vlfhmyqdhq");
 
             IEnumerable<PullRequestModel> prs = client.GetPullRequests(SearchCriterias.Completed)
                 .Where(item => item.CreationDate >= new DateTime(2019, 11, 27));
