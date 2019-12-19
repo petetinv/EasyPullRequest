@@ -2,14 +2,38 @@
 using System.Collections.Generic;
 using System;
 using System.Diagnostics;
+using System.IO;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PullRequetStat
 {
+
     class Program
     {
+        public static IServiceProvider ServiceProvider { get; private set; }
+        public static IConfiguration Configuration { get; set; }
+
         static void Main(string[] args)
         {
-            PullRequestClient client = new PullRequestClient("airbus-caddmu", "EBAM", "");
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+            //TODO: use isDevelopment flags
+            builder.AddUserSecrets<AzureDevOpsSettings>();
+
+            Configuration = builder.Build();
+
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            ServiceProvider = services.BuildServiceProvider();
+
+            PullRequestClientFactory factory = ServiceProvider.GetService<PullRequestClientFactory>();
+            PullRequestClient client = factory.GetInstance();
+
+            //NOTE: add PAT with this command: dotnet user-secrets set pat "xxx"      
+            //PullRequestClient client = new PullRequestClient("airbus-caddmu", "EBAM", "ooxjgbvck3zs5e646k3gmmoqznsruscndfxgzdksp7vlfhmyqdhq");
 
             IEnumerable<PullRequestModel> prs = client.GetPullRequests(SearchCriterias.Completed)
                 .Where(item => item.CreationDate >= new DateTime(2019, 11, 27));
@@ -18,6 +42,12 @@ namespace PullRequetStat
             var storage = new PullRequestStorage(prs);
             storage.Save(path);
             Process.Start(@"C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE", path);
+        }
+
+        private static void ConfigureServices(ServiceCollection services)
+        {
+            services
+                .Configure<AzureDevOpsSettings>(Configuration.GetSection(nameof(AzureDevOpsSettings)));
         }
     }
 }
