@@ -23,6 +23,8 @@ class PullRequestStorage
 
     protected IEnumerable<object> ExtractValues(PullRequestModel pr)
     {
+        yield return pr.Id;
+        yield return pr.Title;
         yield return pr.CreationDate;
         yield return pr.ClosedDate;
         yield return pr.Duration;
@@ -45,7 +47,7 @@ class PullRequestStorage
             //TODO: improve worksheet title with more information than date or something else
             IXLWorksheet ws = workbook.Worksheets.Add("Pull Request Stat");
 
-            var header = new string[] { "CreationDate", "ClosedDate", "Duration" };
+            var header = new string[] { "Id", "Title", "CreationDate", "ClosedDate", "Duration" };
             AddValues(ws.Row(1), header);
             AddModel(ws.Row(2));
 

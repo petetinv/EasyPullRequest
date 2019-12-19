@@ -31,6 +31,8 @@ namespace PullRequetStat
             {
                 yield return new PullRequestModel
                 {
+                    Title = token["title"].Value<string>(),
+                    Id = token["pullRequestId"].Value<int>(),
                     ClosedDate = token["closedDate"].Value<DateTime>(),
                     CreationDate = token["creationDate"].Value<DateTime>()
                 };
