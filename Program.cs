@@ -43,7 +43,7 @@ namespace PullRequetStat
             var path = "pr.xlsx";
             var storage = new PullRequestStorage(prs);
             storage.Save(path);
-            Process.Start(@"C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE", path);
+            Process.Start("explorer", path);
         }
 
         private static void ConfigureServices(ServiceCollection services)
