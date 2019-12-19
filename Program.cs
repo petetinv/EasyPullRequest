@@ -9,7 +9,7 @@ namespace PullRequetStat
     {
         static void Main(string[] args)
         {
-            PullRequestClient client = new PullRequestClient();
+            PullRequestClient client = new PullRequestClient("airbus-caddmu", "EBAM", "");
 
             IEnumerable<PullRequestModel> prs = client.GetPullRequests(SearchCriterias.Completed)
                 .Where(item => item.CreationDate >= new DateTime(2019, 11, 27));
