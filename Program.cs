@@ -47,7 +47,8 @@ namespace PullRequetStat
         private static void ConfigureServices(ServiceCollection services)
         {
             services
-                .Configure<AzureDevOpsSettings>(Configuration.GetSection(nameof(AzureDevOpsSettings)));
+                .Configure<AzureDevOpsSettings>(Configuration.GetSection(nameof(AzureDevOpsSettings)))
+                .AddSingleton<PullRequestClientFactory>();
         }
     }
 }
