@@ -14,7 +14,7 @@ namespace PullRequetStat
         public PullRequestClient(string organization, string projectName, string personalAccessToken)
         {
             GetPullRequestUrlPattern = string.Format(GetPullRequestUrlPattern, organization, projectName, "{0}");
-            BasicAuthentication = string.Concat(BasicAuthentication, ToBase64(Encoding.UTF8, personalAccessToken));
+            BasicAuthentication = string.Concat(BasicAuthentication, ToBase64(Encoding.UTF8, string.Concat(":", personalAccessToken)));
         }
 
         static protected string ToBase64(Encoding encoding, string value)
