@@ -6,4 +6,3 @@ Retrieves somes informations about the (AzureDevOps) pull request, such as its d
 * dotnet user-secrets set "AzureDevOpsSettings:ProjectName": "YourDevOpsProjectName"
 * dotnet user-secrets set "AzureDevOpsSettings:Pat": "YourPersonalAccessToken"
 
-NOTE: the result is exposed directly by Excel with executable file path hardcoded :)
