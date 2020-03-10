@@ -9,7 +9,7 @@ namespace PullRequetStat
 {
     class PullRequestClient
     {
-        protected readonly string GetPullRequestUrlPattern = "https://{0}.visualstudio.com/{1}/_apis/git/pullrequests?&$skip=0&searchCriteria.status={2}&api-version=5.0";
+        protected readonly string GetPullRequestUrlPattern = "https://{0}.visualstudio.com/{1}/_apis/git/pullrequests?&$skip=0&$top=1000&searchCriteria.status={2}&api-version=5.0";
         private readonly string BasicAuthentication = "Basic ";
 
         public PullRequestClient(string organization, string projectName, string personalAccessToken)
@@ -32,10 +32,10 @@ namespace PullRequetStat
                 Id = v.Value<int>("pullRequestId"),
                 Title = v.Value<string>("title"),
                 Description = v.Value<string>("description"),
-                Repository = v["repository"].Value<string>("name"),
+                RepositoryId = v["repository"].Value<string>("id"),
+                RepositoryName = v["repository"].Value<string>("name"),
                 CreationDate = v.Value<DateTime>("creationDate"),
                 ClosedDate = v.Value<DateTime>("closedDate"),
-                MergeStatus = v.Value<string>("mergeStatus"),
                 CreatedBy = v["createdBy"].Value<string>("uniqueName"),
                 Reviewers = v.SelectTokens("reviewers").SelectMany(r => r).Values<string>("uniqueName")
             });

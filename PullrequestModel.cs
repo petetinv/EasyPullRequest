@@ -10,7 +10,9 @@ class PullRequestModel
 
     public string Description { get; set; }
 
-    public string Repository { get; set; }
+    public string RepositoryId { get; set; }
+
+    public string RepositoryName { get; set; }
 
     public DateTime CreationDate { get; set; }
 
@@ -18,8 +20,6 @@ class PullRequestModel
 
     // improve Duration calculation (suppress off moments than weekend, lunch time, etc.)
     public TimeSpan Duration { get => ClosedDate - CreationDate; }
-
-    public string MergeStatus { get; set; }
 
     public string CreatedBy { get; set; }
 
