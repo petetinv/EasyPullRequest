@@ -1,7 +1,6 @@
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using ClosedXML.Excel;
+using System.Collections.Generic;
+using System.Linq;
 
 class PullRequestStorage
 {
@@ -25,9 +24,14 @@ class PullRequestStorage
     {
         yield return pr.Id;
         yield return pr.Title;
+        yield return pr.Description;
+        yield return pr.Repository;
         yield return pr.CreationDate;
         yield return pr.ClosedDate;
         yield return pr.Duration;
+        yield return pr.MergeStatus;
+        yield return pr.CreatedBy;
+        yield return pr.ReviewerAsString;
     }
 
     protected void AddModel(IXLRow row)
@@ -47,7 +51,7 @@ class PullRequestStorage
             //TODO: improve worksheet title with more information than date or something else
             IXLWorksheet ws = workbook.Worksheets.Add("Pull Request Stat");
 
-            var header = new string[] { "Id", "Title", "CreationDate", "ClosedDate", "Duration" };
+            var header = new string[] { "Id", "Title", "Description", "Repository", "CreationDate", "ClosedDate", "Duration", "MergeStatus", "CreatedBy", "Reviewers" };
             AddValues(ws.Row(1), header);
             AddModel(ws.Row(2));
 

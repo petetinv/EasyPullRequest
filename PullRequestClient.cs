@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json.Linq;
@@ -26,17 +27,18 @@ namespace PullRequetStat
 
         protected virtual IEnumerable<PullRequestModel> DeserializeJson(string json)
         {
-            JObject jobject = JObject.Parse(json);
-            foreach (JToken token in jobject["value"])
+            return JObject.Parse(json)["value"].Select(v => new PullRequestModel
             {
-                yield return new PullRequestModel
-                {
-                    Title = token["title"].Value<string>(),
-                    Id = token["pullRequestId"].Value<int>(),
-                    ClosedDate = token["closedDate"].Value<DateTime>(),
-                    CreationDate = token["creationDate"].Value<DateTime>()
-                };
-            }
+                Id = v.Value<int>("pullRequestId"),
+                Title = v.Value<string>("title"),
+                Description = v.Value<string>("description"),
+                Repository = v["repository"].Value<string>("name"),
+                CreationDate = v.Value<DateTime>("creationDate"),
+                ClosedDate = v.Value<DateTime>("closedDate"),
+                MergeStatus = v.Value<string>("mergeStatus"),
+                CreatedBy = v["createdBy"].Value<string>("uniqueName"),
+                Reviewers = v.SelectTokens("reviewers").SelectMany(r => r).Values<string>("uniqueName")
+            });
         }
 
         public IEnumerable<PullRequestModel> GetPullRequests(string searchCriteria)
@@ -46,7 +48,6 @@ namespace PullRequetStat
                 client.Headers.Add(HttpRequestHeader.Authorization, BasicAuthentication);
                 string url = string.Format(GetPullRequestUrlPattern, searchCriteria);
                 string json = client.DownloadString(url);
-                //File.WriteAllText("toto.json", client.DownloadString(url));
                 return DeserializeJson(json);
             }
         }
