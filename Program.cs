@@ -35,13 +35,16 @@ namespace PullRequetStat
             Initialize();
 
             PullRequestClientFactory factory = ServiceProvider.GetService<PullRequestClientFactory>();
-            PullRequestClient client = factory.GetInstance();
+            PullRequestClient prClient = factory.GetPRInstance();
+            PullRequestCommentClient commentClient = factory.GetCommentInstance();
 
-            IEnumerable<PullRequestModel> prs = client.GetPullRequests(SearchCriterias.Completed)
+            IEnumerable<PullRequestModel> prs = prClient.GetPullRequests(SearchCriterias.Completed)
                 .Where(item => item.CreationDate >= new DateTime(2019, 11, 27));
 
+            IEnumerable<PullRequestCommentModel> comments = commentClient.GetComments(prs);
+
             var path = Path.ChangeExtension(Path.GetTempFileName(), ".xlsx");
-            var storage = new PullRequestStorage(prs);
+            var storage = new PullRequestStorage(prs, comments);
             storage.Save(path);
             Process.Start("explorer", path);
         }

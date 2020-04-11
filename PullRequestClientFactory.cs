@@ -9,8 +9,13 @@ class PullRequestClientFactory
         this.settings = settings.Value;
     }
 
-    public PullRequestClient GetInstance()
+    public PullRequestClient GetPRInstance()
     {
         return new PullRequestClient(settings.OrganizationName, settings.ProjectName, settings.Pat);
+    }
+
+    public PullRequestCommentClient GetCommentInstance()
+    {
+        return new PullRequestCommentClient(settings.OrganizationName, settings.ProjectName, settings.Pat);
     }
 }
