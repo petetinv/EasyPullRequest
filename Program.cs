@@ -46,8 +46,16 @@ namespace PullRequetStat
             {
                 throw new Exception($"Reposotory 'DMU Integration and Services' not found!");
             }
-            
+
             var branches = prClient.GetBranches(repository.FirstOrDefault().Id);
+
+            var branch = branches.FirstOrDefault(item => item.Name.EndsWith("stories/S-333198_dbowners"));
+            if (branch == null)
+            {
+                throw new Exception($"Branch reference not found: '{branch.Name}'!");
+            }
+
+            prClient.DeleteBranch(branch.Id);
 
             IEnumerable<PullRequestModel> prs = prClient.GetPullRequests(SearchCriterias.Completed)
                 .Where(item => item.CreationDate >= new DateTime(2021, 8, 1));
