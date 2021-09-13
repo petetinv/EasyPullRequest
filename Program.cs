@@ -38,8 +38,19 @@ namespace PullRequetStat
             PullRequestClient prClient = factory.GetPRInstance();
             PullRequestCommentClient commentClient = factory.GetCommentInstance();
 
+            var repository = prClient
+                .GetRepositories()
+                .Where(item => item.Name == "DMU Integration and Services");
+            
+            if (repository == null)
+            {
+                throw new Exception($"Reposotory 'DMU Integration and Services' not found!");
+            }
+            
+            var branches = prClient.GetBranches(repository.FirstOrDefault().Id);
+
             IEnumerable<PullRequestModel> prs = prClient.GetPullRequests(SearchCriterias.Completed)
-                .Where(item => item.CreationDate >= new DateTime(2019, 11, 27));
+                .Where(item => item.CreationDate >= new DateTime(2021, 8, 1));
 
             IEnumerable<PullRequestCommentModel> comments = commentClient.GetComments(prs);
 

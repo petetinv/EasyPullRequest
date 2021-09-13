@@ -9,12 +9,18 @@ namespace PullRequetStat
 {
     class PullRequestClient
     {
+        protected readonly string GetBranchesPattern = "https://dev.azure.com/{0}/{1}/_apis/git/repositories/{1}/refs?api-version=4.1";
+        protected readonly string GetReposotiriesPattern = "https://{0}.visualstudio.com/{1}/_apis/git/repositories";
+
         protected readonly string GetPullRequestUrlPattern = "https://{0}.visualstudio.com/{1}/_apis/git/pullrequests?&$skip=0&$top=1000&searchCriteria.status={2}&api-version=5.0";
         private readonly string BasicAuthentication = "Basic ";
 
         public PullRequestClient(string organization, string projectName, string personalAccessToken)
         {
             GetPullRequestUrlPattern = string.Format(GetPullRequestUrlPattern, organization, projectName, "{0}");
+            GetReposotiriesPattern = string.Format(GetReposotiriesPattern, organization, projectName);
+            GetBranchesPattern = string.Format(GetBranchesPattern, organization, projectName);
+            
             BasicAuthentication = string.Concat(BasicAuthentication, ToBase64(Encoding.UTF8, string.Concat(":", personalAccessToken)));
         }
 
@@ -23,6 +29,25 @@ namespace PullRequetStat
             var bytes = encoding.GetBytes(value);
             string base64 = Convert.ToBase64String(bytes);
             return base64;
+        }
+
+        protected virtual IEnumerable<BaseModel> DeserializeJsonRepo(string json)
+        {
+            return JObject.Parse(json)["value"].Select(v => new BaseModel
+            {
+                Id = v.Value<string>("id"),
+                Name = v.Value<string>("name"),
+                Url = v.Value<string>("url"),
+            });
+        }
+        protected virtual IEnumerable<BaseModel> DeserializeJsonBranch(string json)
+        {
+            return JObject.Parse(json)["value"].Select(v => new BaseModel
+            {
+                Id = v.Value<string>("objectId"),
+                Name = v.Value<string>("name"),
+                Url = v.Value<string>("url"),
+            });
         }
 
         protected virtual IEnumerable<PullRequestModel> DeserializeJson(string json)
@@ -52,5 +77,25 @@ namespace PullRequetStat
             }
         }
 
+        public IEnumerable<BaseModel> GetRepositories()
+        {
+            using (WebClient client = new WebClient())
+            {
+                client.Headers.Add(HttpRequestHeader.Authorization, BasicAuthentication);
+                string json = client.DownloadString(GetReposotiriesPattern);
+                return DeserializeJsonRepo(json);
+            }
+        }
+
+        public IEnumerable<BaseModel> GetBranches(string repositoryId)
+        {
+            using (WebClient client = new WebClient())
+            {
+                client.Headers.Add(HttpRequestHeader.Authorization, BasicAuthentication);
+                string url = string.Format(GetBranchesPattern, repositoryId);
+                string json = client.DownloadString(url);
+                return DeserializeJsonBranch(json);
+            }
+        }
     }
 }
