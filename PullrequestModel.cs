@@ -1,12 +1,36 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+
+class BranchNameComparer : IEqualityComparer<BaseModel>
+{
+    public bool Equals(BaseModel x, BaseModel y)
+    {
+        return x?.Name?.Equals(y?.Name) ?? false;
+    }
+
+    public int GetHashCode([DisallowNull] BaseModel obj)
+    {
+        return obj.Name.GetHashCode();
+    }
+}
 
 class BaseModel
 {
     public string Id { get; set; }
     public string Name { get; set; }
     public string Url { get; set; }
+
+    public bool Equals(string x, string y)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int GetHashCode([DisallowNull] string obj)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 class PullRequestModel

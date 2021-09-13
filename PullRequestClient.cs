@@ -11,11 +11,12 @@ namespace PullRequetStat
 {
     class PullRequestClient
     {
+        protected readonly string GetCommitPattern = "https://dev.azure.com/{0}/{1}/_apis/git/repositories/{2}/items?versionDescriptor.version={3}";
         protected readonly string DeleteBranchPattern = "https://dev.azure.com/{0}/{1}/_apis/git/repositories/{2}/refs?api-version=6.0";
-        protected readonly string GetBranchesPattern = "https://dev.azure.com/{0}/{1}/_apis/git/repositories/{2}/refs?api-version=4.1";
-        protected readonly string GetReposotiriesPattern = "https://{0}.visualstudio.com/{1}/_apis/git/repositories";
+        protected readonly string GetBranchesPattern = "https://dev.azure.com/{0}/{1}/_apis/git/repositories/{2}/refs?api-version=6.0";
+        protected readonly string GetReposotiriesPattern = "https://{0}.visualstudio.com/{1}/_apis/git/repositories?api-version=6.0";
 
-        protected readonly string GetPullRequestUrlPattern = "https://{0}.visualstudio.com/{1}/_apis/git/pullrequests?&$skip=0&$top=1000&searchCriteria.status={2}&api-version=5.0";
+        protected readonly string GetPullRequestUrlPattern = "https://{0}.visualstudio.com/{1}/_apis/git/pullrequests?&$skip=0&$top=1000&searchCriteria.status={2}&api-version=6.0";
         private readonly string BasicAuthentication = "Basic ";
 
         public PullRequestClient(string organization, string projectName, string personalAccessToken)
@@ -23,7 +24,8 @@ namespace PullRequetStat
             GetPullRequestUrlPattern = string.Format(GetPullRequestUrlPattern, organization, projectName, "{0}");
             GetReposotiriesPattern = string.Format(GetReposotiriesPattern, organization, projectName);
             GetBranchesPattern = string.Format(GetBranchesPattern, organization, projectName, "{0}");
-            DeleteBranchPattern = string.Format(DeleteBranchPattern, organization, projectName, "{0}", "{1}");
+            DeleteBranchPattern = string.Format(DeleteBranchPattern, organization, projectName, "{0}");
+            GetCommitPattern = string.Format(GetCommitPattern, organization, projectName, "{0}", "{1}");
 
             BasicAuthentication = string.Concat(BasicAuthentication, ToBase64(Encoding.UTF8, string.Concat(":", personalAccessToken)));
         }
@@ -119,5 +121,17 @@ namespace PullRequetStat
                 client.UploadString(url, "POST", body);
             }
         }
+
+        public string GetCommitId(string repositoryId, string branchName)
+        {
+            using (WebClient client = new WebClient())
+            {
+                client.Headers.Add(HttpRequestHeader.Authorization, BasicAuthentication);
+                string url = string.Format(GetCommitPattern, repositoryId, branchName);
+                string json = client.DownloadString(url);
+
+                return JObject.Parse(json)["value"].FirstOrDefault()?.Value<string>("commitId");
+            }
+       }
     }
 }

@@ -47,15 +47,24 @@ namespace PullRequetStat
                 throw new Exception($"Reposotory 'DMU Integration and Services' not found!");
             }
 
-            var branches = prClient.GetBranches(repository.Id);
+            var brancheNames2purge = File.ReadAllLines(@"C:\Users\ng7157C\Desktop\branch-to-purge1.txt")
+                .Select(item => new BaseModel { Name = item.Replace("origin/", "refs/heads/") });
+            
+            var branches2Purge = prClient.GetBranches(repository.Id)
+                .Intersect(brancheNames2purge, new BranchNameComparer());
 
-            var branch = branches.FirstOrDefault(item => item.Name.EndsWith("stories/S-333198_dbowners"));
-            if (branch == null)
+
+            using (FileStream stream = new FileStream(@"C:\Users\ng7157C\Desktop\branch-to-purge1.output", FileMode.Create))
+            using (StreamWriter writer = new StreamWriter(stream))
             {
-                throw new Exception($"Branch reference not found: '{branch.Name}'!");
+                foreach (var branch in branches2Purge)
+                {
+                    string branchName = branch.Name.Replace("refs/heads/", string.Empty);
+                    string commitId = prClient.GetCommitId(repository.Id, branchName);
+                    writer.WriteLine($"{commitId};{branchName}");
+                    //prClient.DeleteBranch(repository.Id, branch.Name, branch.Id);
+                }
             }
-
-            prClient.DeleteBranch(repository.Id, branch.Name, branch.Id);
 
             IEnumerable<PullRequestModel> prs = prClient.GetPullRequests(SearchCriterias.Completed)
                 .Where(item => item.CreationDate >= new DateTime(2021, 8, 1));
