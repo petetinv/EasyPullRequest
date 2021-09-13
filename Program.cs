@@ -40,14 +40,14 @@ namespace PullRequetStat
 
             var repository = prClient
                 .GetRepositories()
-                .Where(item => item.Name == "DMU Integration and Services");
+                .FirstOrDefault(item => item.Name == "DMU Integration and Services");
             
             if (repository == null)
             {
                 throw new Exception($"Reposotory 'DMU Integration and Services' not found!");
             }
 
-            var branches = prClient.GetBranches(repository.FirstOrDefault().Id);
+            var branches = prClient.GetBranches(repository.Id);
 
             var branch = branches.FirstOrDefault(item => item.Name.EndsWith("stories/S-333198_dbowners"));
             if (branch == null)
@@ -55,7 +55,7 @@ namespace PullRequetStat
                 throw new Exception($"Branch reference not found: '{branch.Name}'!");
             }
 
-            prClient.DeleteBranch(branch.Id);
+            prClient.DeleteBranch(repository.Id, branch.Name, branch.Id);
 
             IEnumerable<PullRequestModel> prs = prClient.GetPullRequests(SearchCriterias.Completed)
                 .Where(item => item.CreationDate >= new DateTime(2021, 8, 1));

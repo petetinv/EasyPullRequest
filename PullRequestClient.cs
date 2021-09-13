@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace PullRequetStat
 {
     class PullRequestClient
     {
-        protected readonly string DeleteBranchPattern = "https://dev.azure.com/{0}/{1}/_apis/git/favorites/refs/{2}?api-version=4.1-preview.1";
+        protected readonly string DeleteBranchPattern = "https://{0}.visualstudio.com/{1}/_apis/git/repositories/{2}/refs?api-version=4.1";
         protected readonly string GetBranchesPattern = "https://dev.azure.com/{0}/{1}/_apis/git/repositories/{2}/refs?api-version=4.1";
         protected readonly string GetReposotiriesPattern = "https://{0}.visualstudio.com/{1}/_apis/git/repositories";
 
@@ -21,7 +23,7 @@ namespace PullRequetStat
             GetPullRequestUrlPattern = string.Format(GetPullRequestUrlPattern, organization, projectName, "{0}");
             GetReposotiriesPattern = string.Format(GetReposotiriesPattern, organization, projectName);
             GetBranchesPattern = string.Format(GetBranchesPattern, organization, projectName, "{0}");
-            DeleteBranchPattern = string.Format(DeleteBranchPattern, organization, projectName, "{0}");
+            DeleteBranchPattern = string.Format(DeleteBranchPattern, organization, projectName, "{0}", "{1}");
 
             BasicAuthentication = string.Concat(BasicAuthentication, ToBase64(Encoding.UTF8, string.Concat(":", personalAccessToken)));
         }
@@ -100,13 +102,20 @@ namespace PullRequetStat
             }
         }
 
-        public void DeleteBranch(string branchId)
+        public void DeleteBranch(string repositoryId, string branchName, string branchId)
         {
             using (WebClient client = new WebClient())
             {
                 client.Headers.Add(HttpRequestHeader.Authorization, BasicAuthentication);
-                string url = string.Format(DeleteBranchPattern, branchId);
-                client.UploadString(url, "DELETE", string.Empty);
+                string url = string.Format(DeleteBranchPattern, repositoryId);
+                
+                string body = JsonConvert.SerializeObject(new[] { new {
+                    name = $"{branchName.Replace("refs/heads/", string.Empty)}",
+                    oldObjectId = $"{branchId}",
+                    newObjectId = "0000000000000000000000000000000000000000",
+                }});
+
+                client.UploadString(url, "PATCH", body);
             }
         }
     }
