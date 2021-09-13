@@ -115,6 +115,7 @@ namespace PullRequetStat
                     newObjectId = "0000000000000000000000000000000000000000",
                 }});
 
+                client.Headers.Add(HttpRequestHeader.ContentType, "application/json");
                 client.UploadString(url, "POST", body);
             }
         }
