@@ -11,7 +11,7 @@ namespace PullRequetStat
 {
     class PullRequestClient
     {
-        protected readonly string DeleteBranchPattern = "https://{0}.visualstudio.com/{1}/_apis/git/repositories/{2}/refs?api-version=4.1";
+        protected readonly string DeleteBranchPattern = "https://dev.azure.com/{0}/{1}/_apis/git/repositories/{2}/refs?api-version=6.0";
         protected readonly string GetBranchesPattern = "https://dev.azure.com/{0}/{1}/_apis/git/repositories/{2}/refs?api-version=4.1";
         protected readonly string GetReposotiriesPattern = "https://{0}.visualstudio.com/{1}/_apis/git/repositories";
 
@@ -107,15 +107,15 @@ namespace PullRequetStat
             using (WebClient client = new WebClient())
             {
                 client.Headers.Add(HttpRequestHeader.Authorization, BasicAuthentication);
-                string url = string.Format(DeleteBranchPattern, repositoryId);
+                string url = string.Format(DeleteBranchPattern, repositoryId, branchName);
                 
                 string body = JsonConvert.SerializeObject(new[] { new {
-                    name = $"{branchName.Replace("refs/heads/", string.Empty)}",
+                    name = $"{branchName}",
                     oldObjectId = $"{branchId}",
                     newObjectId = "0000000000000000000000000000000000000000",
                 }});
 
-                client.UploadString(url, "PATCH", body);
+                client.UploadString(url, "POST", body);
             }
         }
     }
