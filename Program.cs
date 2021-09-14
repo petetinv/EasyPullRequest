@@ -61,8 +61,15 @@ namespace PullRequetStat
                 {
                     string branchName = branch.Name.Replace("refs/heads/", string.Empty);
                     string commitId = prClient.GetCommitId(repository.Id, branchName);
-                    writer.WriteLine($"{commitId};{branchName}");
-                    //prClient.DeleteBranch(repository.Id, branch.Name, branch.Id);
+                    try 
+                    {
+                        prClient.DeleteBranch(repository.Id, branch.Name, branch.Id);
+                        writer.WriteLine($"{commitId};{branchName}, deleted.");
+                    }
+                    catch (Exception e)
+                    {
+                        writer.WriteLine($"{commitId};{branchName}, error: {e.Message}");
+                    }
                 }
             }
 
